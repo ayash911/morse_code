@@ -1,71 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Morse Code Generator</title>
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.png') }}">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
-    rel="stylesheet"
-  />
-  <link
-    rel="stylesheet"
-    type="text/css"
-    href="{{ url_for('static', filename='style.css') }}"
-  />
-</head>
-<body>
-  <center>
-    <h1>Morse Code Generator</h1>
-    <form action="/" method="POST" class="neon-border">
-      <input
-        type="text"
-        name="text"
-        placeholder="Enter text to convert"
-        required
-      />
-      <input type="submit" value="Convert to Morse Code" />
-    </form>
-
-    {% if morse_code %}
-    <div class="output">
-      <h2>Text:</h2>
-      <p>{{ input_text }}</p>
-      <h2>Morse Code:</h2>
-      <p><b>{{ morse_code }}</b></p>
-      {% if audio_file %}
-      <h3>Listen to Morse Code:</h3>
-      <audio controls>
-        <source
-          src="{{ url_for('play_audio', filename=audio_file) }}"
-          type="audio/wav"
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Morse Code Generator</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='favicon.png') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <center>
+      <h1>Morse Code Generator</h1>
+      <form action="/" method="POST" class="neon-border">
+        <input
+          type="text"
+          name="text"
+          placeholder="Enter text to convert"
+          required
         />
-        Your browser does not support the audio tag.
-      </audio>
-      <a href="{{ url_for('play_audio', filename=audio_file) }}" download= "{{ input_text | replace(' ', '_') }}.wav" class="download-btn">Download Audio</a>
+        <input type="submit" value="Convert to Morse Code" />
+      </form>
+
+      {% if morse_code %}
+      <div class="output">
+        <h2>Text:</h2>
+        <p>{{ input_text }}</p>
+        <h2>Morse Code:</h2>
+        <p><b>{{ morse_code }}</b></p>
+        {% if audio_file %}
+        <h3>Listen to Morse Code:</h3>
+        <audio controls>
+          <source
+            src="{{ url_for('play_audio', filename=audio_file.split('/')[-1]) }}"
+            type="audio/wav"
+          />
+          Your browser does not support the audio tag.
+        </audio>
+        <a
+          href="{{ url_for('play_audio', filename=audio_file) }}"
+          download="{{ input_text | replace(' ', '_') }}.wav"
+          class="download-btn"
+          >Download Audio</a
+        >
+        {% endif %}
+      </div>
       {% endif %}
-    </div>
-    {% endif %}
-  </center>
+    </center>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const inputField = document.querySelector('input[type="text"]');
-      inputField.addEventListener("focus", function () {
-        this.style.boxShadow = "0 0 10px #00ccff, 0 0 20px #00ffcc";
-      });
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const inputField = document.querySelector('input[type="text"]');
+        inputField.addEventListener("focus", function () {
+          this.style.boxShadow = "0 0 10px #00ccff, 0 0 20px #00ffcc";
+        });
 
-      inputField.addEventListener("blur", function () {
-        this.style.boxShadow = "none";
-      });
+        inputField.addEventListener("blur", function () {
+          this.style.boxShadow = "none";
+        });
 
-      const button = document.querySelector('input[type="submit"]');
-      button.addEventListener("click", function () {
-        const audio = new Audio("click-sound.mp3");
-        audio.play();
+        const button = document.querySelector('input[type="submit"]');
+        button.addEventListener("click", function () {
+          const audio = new Audio("click-sound.mp3");
+          audio.play();
+        });
       });
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

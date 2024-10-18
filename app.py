@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, send_file, abort
 from pydub import AudioSegment
 import numpy as np
+import logging
 import os
 import uuid
 
@@ -52,10 +53,14 @@ def home():
         audio_file_path = generate_morse_audio(morse_code)
     return render_template('index.html', input_text=input_text, morse_code=morse_code, audio_file=audio_file_path)
 
+
+AUDIO_DIRECTORY = 'tmp'  # Ensure this is the correct path
+
 @app.route('/play/<path:filename>')
 def play_audio(filename):
     filepath = os.path.join(AUDIO_DIRECTORY, filename)  # Update the path
     if not os.path.isfile(filepath):
+        logging.error(f"File not found: {filepath}")
         return abort(404, description="File not found")
     return send_file(filepath, mimetype='audio/wav')
 
