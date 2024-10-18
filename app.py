@@ -1,10 +1,14 @@
 from flask import Flask, request, render_template, send_file, abort
 from pydub import AudioSegment
 import numpy as np
-import tempfile
 import os
+import uuid
 
 app = Flask(__name__)
+
+# Create a directory to store audio files
+AUDIO_DIRECTORY = 'audio_files'
+os.makedirs(AUDIO_DIRECTORY, exist_ok=True)
 
 morse_code_dict = {}
 with open('morse_code.txt', 'r') as file:
@@ -32,9 +36,10 @@ def generate_morse_audio(morse_code):
             audio += beep + AudioSegment.silent(duration=100)
         else:
             audio += AudioSegment.silent(duration=200)
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
-        audio.export(tmp_file.name, format='wav')
-        return tmp_file.name
+    
+    filename = os.path.join(AUDIO_DIRECTORY, f'{uuid.uuid4()}.wav')  # Unique filename
+    audio.export(filename, format='wav')
+    return filename
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -45,14 +50,14 @@ def home():
         input_text = request.form['text']
         morse_code = convert_to_morse(input_text)
         audio_file_path = generate_morse_audio(morse_code)
-        print(f"Generated audio file at: {audio_file_path}")
     return render_template('index.html', input_text=input_text, morse_code=morse_code, audio_file=audio_file_path)
 
 @app.route('/play/<path:filename>')
 def play_audio(filename):
-    if not os.path.isfile(filename):
+    filepath = os.path.join(AUDIO_DIRECTORY, filename)  # Update the path
+    if not os.path.isfile(filepath):
         return abort(404, description="File not found")
-    return send_file(filename, mimetype='audio/wav')
+    return send_file(filepath, mimetype='audio/wav')
 
 if __name__ == '__main__':
     app.run(debug=True)
