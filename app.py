@@ -32,7 +32,6 @@ def generate_morse_audio(morse_code):
             audio += beep + AudioSegment.silent(duration=100)
         else:
             audio += AudioSegment.silent(duration=200)
-
     with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
         audio.export(tmp_file.name, format='wav')
         return tmp_file.name
@@ -42,12 +41,11 @@ def home():
     morse_code = ''
     input_text = ''
     audio_file_path = ''
-    
     if request.method == 'POST':
         input_text = request.form['text']
         morse_code = convert_to_morse(input_text)
         audio_file_path = generate_morse_audio(morse_code)
-
+        print(f"Generated audio file at: {audio_file_path}")
     return render_template('index.html', input_text=input_text, morse_code=morse_code, audio_file=audio_file_path)
 
 @app.route('/play/<path:filename>')
